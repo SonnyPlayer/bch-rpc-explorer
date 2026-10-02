@@ -59,17 +59,12 @@ const args = require('meow')(`
 
 const envify = k => k.replace(/([A-Z])/g, '_$1').toUpperCase();
 
-var defaultTrueWithoutNoPrefixVars = [ "SLOW_DEVICE_MODE" ];
-
 Object.keys(args).filter(k => k.length > 1).forEach(k => {
   if (args[k] === false) {
-    if (defaultTrueWithoutNoPrefixVars.includes(envify(k))) {
-      process.env[`BTCEXP_${envify(k)}`] = false;
-
-    } else {
-      process.env[`BTCEXP_NO_${envify(k)}`] = true;
-    }
-  } else {
+    // Always set the positive environment variable to "false" to properly override
+    // any inherited environment state, rather than creating unused BTCEXP_NO_* variables
+    process.env[`BTCEXP_${envify(k)}`] = "false";
+  } else if (args[k] !== undefined) {
     process.env[`BTCEXP_${envify(k)}`] = args[k];
   }
 });
