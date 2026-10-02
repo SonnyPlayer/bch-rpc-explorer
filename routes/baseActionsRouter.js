@@ -251,6 +251,13 @@ router.get("/peers", function(req, res, next) {
 });
 
 router.post("/connect", function(req, res, next) {
+	// Require authentication to prevent unauthorized RPC backend changes
+	// that could enable cross-user XSS attacks via malicious RPC responses
+	if (!config.demoSite && !req.authenticated) {
+		res.status(403).send("RPC Connect requires authentication. Set an authentication password via the 'BTCEXP_BASIC_AUTH_PASSWORD' environment variable (see .env-sample file for more info).");
+		return;
+	}
+
 	var host = req.body.host;
 	var port = req.body.port;
 	var username = req.body.username;
@@ -283,6 +290,12 @@ router.post("/connect", function(req, res, next) {
 });
 
 router.get("/disconnect", function(req, res, next) {
+	// Require authentication to prevent unauthorized RPC backend changes
+	if (!config.demoSite && !req.authenticated) {
+		res.status(403).send("RPC Disconnect requires authentication. Set an authentication password via the 'BTCEXP_BASIC_AUTH_PASSWORD' environment variable (see .env-sample file for more info).");
+		return;
+	}
+
 	res.cookie('rpc-host', "");
 	res.cookie('rpc-port', "");
 	res.cookie('rpc-username', "");
