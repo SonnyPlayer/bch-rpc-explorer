@@ -29,7 +29,26 @@ global.rpcStats = {};
 
 
 function getBlockchainInfo() {
-	return getRpcData("getblockchaininfo");
+	return getRpcData("getblockchaininfo").then(function(result) {
+		// Validate and sanitize numeric fields to prevent XSS and ensure type safety
+		if (result && result.blocks !== undefined) {
+			// Ensure blocks is a valid non-negative integer
+			var blocks = parseInt(result.blocks, 10);
+			if (isNaN(blocks) || blocks < 0) {
+				throw new Error("Invalid blocks value in getblockchaininfo response");
+			}
+			result.blocks = blocks;
+		}
+		if (result && result.headers !== undefined) {
+			// Ensure headers is a valid non-negative integer
+			var headers = parseInt(result.headers, 10);
+			if (isNaN(headers) || headers < 0) {
+				throw new Error("Invalid headers value in getblockchaininfo response");
+			}
+			result.headers = headers;
+		}
+		return result;
+	});
 }
 
 function getNetworkInfo() {
@@ -147,11 +166,31 @@ function getBlockHash(blockHeight) {
 }
 
 function getBlock(hash_or_height) {
-	return getRpcDataWithParams({method:"getblock", parameters:[hash_or_height]});
+	return getRpcDataWithParams({method:"getblock", parameters:[hash_or_height]}).then(function(result) {
+		// Validate and sanitize the height field to prevent XSS and ensure type safety
+		if (result && result.height !== undefined) {
+			var height = parseInt(result.height, 10);
+			if (isNaN(height) || height < 0) {
+				throw new Error("Invalid height value in getblock response");
+			}
+			result.height = height;
+		}
+		return result;
+	});
 }
 
 function getBlockHeader(hash_or_height) {
-	return getRpcDataWithParams({method:"getblockheader", parameters:[hash_or_height]});
+	return getRpcDataWithParams({method:"getblockheader", parameters:[hash_or_height]}).then(function(result) {
+		// Validate and sanitize the height field to prevent XSS and ensure type safety
+		if (result && result.height !== undefined) {
+			var height = parseInt(result.height, 10);
+			if (isNaN(height) || height < 0) {
+				throw new Error("Invalid height value in getblockheader response");
+			}
+			result.height = height;
+		}
+		return result;
+	});
 }
 
 function getAddress(address) {
