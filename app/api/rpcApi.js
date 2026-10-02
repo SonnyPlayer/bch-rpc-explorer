@@ -29,7 +29,44 @@ global.rpcStats = {};
 
 
 function getBlockchainInfo() {
-	return getRpcData("getblockchaininfo");
+	return getRpcData("getblockchaininfo").then(function(result) {
+		// Validate critical numeric fields to prevent XSS via malicious RPC responses
+		if (result && typeof result === 'object') {
+			// Validate 'blocks' field - must be a safe integer
+			if (result.blocks !== undefined) {
+				var blocks = result.blocks;
+				if (typeof blocks !== 'number' || !Number.isInteger(blocks) || !Number.isSafeInteger(blocks) || blocks < 0) {
+					throw new Error('Invalid blocks value from RPC: expected non-negative safe integer, got ' + typeof blocks + ' with value: ' + String(blocks).substring(0, 100));
+				}
+			}
+			
+			// Validate 'headers' field - must be a safe integer
+			if (result.headers !== undefined) {
+				var headers = result.headers;
+				if (typeof headers !== 'number' || !Number.isInteger(headers) || !Number.isSafeInteger(headers) || headers < 0) {
+					throw new Error('Invalid headers value from RPC: expected non-negative safe integer, got ' + typeof headers + ' with value: ' + String(headers).substring(0, 100));
+				}
+			}
+			
+			// Validate 'difficulty' field - must be a finite number
+			if (result.difficulty !== undefined) {
+				var difficulty = result.difficulty;
+				if (typeof difficulty !== 'number' || !Number.isFinite(difficulty) || difficulty < 0) {
+					throw new Error('Invalid difficulty value from RPC: expected non-negative finite number, got ' + typeof difficulty + ' with value: ' + String(difficulty).substring(0, 100));
+				}
+			}
+			
+			// Validate 'verificationprogress' field - must be a finite number between 0 and 1
+			if (result.verificationprogress !== undefined) {
+				var verificationprogress = result.verificationprogress;
+				if (typeof verificationprogress !== 'number' || !Number.isFinite(verificationprogress)) {
+					throw new Error('Invalid verificationprogress value from RPC: expected finite number, got ' + typeof verificationprogress + ' with value: ' + String(verificationprogress).substring(0, 100));
+				}
+			}
+		}
+		
+		return result;
+	});
 }
 
 function getNetworkInfo() {
