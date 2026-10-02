@@ -11,7 +11,9 @@ block content
 		div.col
 			if (!config.demoSite && (!config.credentials.rpc || !config.credentials.rpc.rpc))
 				span(style="float: right;")
-					a.btn.btn-secondary(href="/disconnect") Disconnect from node
+					form(method="POST", action="/disconnect", style="display: inline;")
+						input(type="hidden", name="_csrf", value=csrfToken)
+						button.btn.btn-secondary(type="submit") Disconnect from node
 	
 	hr
 
