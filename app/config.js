@@ -83,7 +83,7 @@ module.exports = {
   rpcConcurrency: (process.env.BTCEXP_RPC_CONCURRENCY || 10),
 
   rpcBlacklist:
-    process.env.BTCEXP_RPC_ALLOWALL  ? []
+    (process.env.BTCEXP_RPC_ALLOWALL && process.env.BTCEXP_RPC_ALLOWALL.toLowerCase() === "true")  ? []
   : process.env.BTCEXP_RPC_BLACKLIST ? process.env.BTCEXP_RPC_BLACKLIST.split(',').filter(Boolean)
   : [
     "addnode",
