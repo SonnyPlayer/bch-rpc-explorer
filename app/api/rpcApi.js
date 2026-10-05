@@ -299,48 +299,65 @@ function getRpcData(cmd) {
 		debugLog(`RPC: ${cmd}`);
 
 		rpcCall = function(callback) {
-			var client = (cmd == "gettxoutsetinfo" ? global.rpcClientNoTimeout : global.rpcClient);
+			try {
+				var client = (cmd == "gettxoutsetinfo" ? global.rpcClientNoTimeout : global.rpcClient);
 
-			client.command(cmd, function(err, result, resHeaders) {
-				try {
-					if (err) {
-						logStats(cmd, false, new Date().getTime() - startTime, false);
+				if (!client) {
+					logStats(cmd, false, new Date().getTime() - startTime, false);
+					var err = new Error("RPC client is not available");
+					utils.logError("rpc-client-null-01", err, {request:cmd});
+					reject(err);
+					callback();
+					return;
+				}
 
-						throw new Error(`RpcError: type=failure-01`);
-					}
-
-					if (Array.isArray(result) && result.length == 1) {
-						var result0 = result[0];
-						
-						if (result0 && result0.name && result0.name == "RpcError") {
+				client.command(cmd, function(err, result, resHeaders) {
+					try {
+						if (err) {
 							logStats(cmd, false, new Date().getTime() - startTime, false);
 
-							throw new Error(`RpcError: type=errorResponse-01`);
+							throw new Error(`RpcError: type=failure-01`);
 						}
+
+						if (Array.isArray(result) && result.length == 1) {
+							var result0 = result[0];
+							
+							if (result0 && result0.name && result0.name == "RpcError") {
+								logStats(cmd, false, new Date().getTime() - startTime, false);
+
+								throw new Error(`RpcError: type=errorResponse-01`);
+							}
+						}
+
+						if (result.name && result.name == "RpcError") {
+							logStats(cmd, false, new Date().getTime() - startTime, false);
+
+							throw new Error(`RpcError: type=errorResponse-02`);
+						}
+
+						resolve(result);
+
+						logStats(cmd, false, new Date().getTime() - startTime, true);
+
+						callback();
+
+					} catch (e) {
+						e.userData = {error:err, request:cmd, result:result};
+
+						utils.logError("9u4278t5h7rfhgf", e, {error:err, request:cmd, result:result});
+
+						reject(e);
+
+						callback();
 					}
-
-					if (result.name && result.name == "RpcError") {
-						logStats(cmd, false, new Date().getTime() - startTime, false);
-
-						throw new Error(`RpcError: type=errorResponse-02`);
-					}
-
-					resolve(result);
-
-					logStats(cmd, false, new Date().getTime() - startTime, true);
-
-					callback();
-
-				} catch (e) {
-					e.userData = {error:err, request:cmd, result:result};
-
-					utils.logError("9u4278t5h7rfhgf", e, {error:err, request:cmd, result:result});
-
-					reject(e);
-
-					callback();
-				}
-			});
+				});
+			} catch (e) {
+				logStats(cmd, false, new Date().getTime() - startTime, false);
+				e.userData = {request:cmd};
+				utils.logError("rpc-client-error-01", e, {request:cmd});
+				reject(e);
+				callback();
+			}
 		};
 		
 		rpcQueue.push({rpcCall:rpcCall});
@@ -354,46 +371,63 @@ function getRpcDataWithParams(request) {
 		debugLog(`RPC: ${JSON.stringify(request)}`);
 
 		rpcCall = function(callback) {
-			global.rpcClient.command([request], function(err, result, resHeaders) {
-				try {
-					if (err != null) {
-						logStats(request.method, true, new Date().getTime() - startTime, false);
+			try {
+				if (!global.rpcClient) {
+					logStats(request.method, true, new Date().getTime() - startTime, false);
+					var err = new Error("RPC client is not available");
+					utils.logError("rpc-client-null-02", err, {request:request});
+					reject(err);
+					callback();
+					return;
+				}
 
-						throw new Error(`RpcError: type=failure-02`);
-					}
-
-					if (Array.isArray(result) && result.length == 1) {
-						var result0 = result[0];
-
-						if (result0 && result0.name && result0.name == "RpcError") {
+				global.rpcClient.command([request], function(err, result, resHeaders) {
+					try {
+						if (err != null) {
 							logStats(request.method, true, new Date().getTime() - startTime, false);
 
-							throw new Error(`RpcError: type=errorResponse-03`);
+							throw new Error(`RpcError: type=failure-02`);
 						}
+
+						if (Array.isArray(result) && result.length == 1) {
+							var result0 = result[0];
+
+							if (result0 && result0.name && result0.name == "RpcError") {
+								logStats(request.method, true, new Date().getTime() - startTime, false);
+
+								throw new Error(`RpcError: type=errorResponse-03`);
+							}
+						}
+
+						if (result.name && result.name == "RpcError") {
+							logStats(request.method, true, new Date().getTime() - startTime, false);
+
+							throw new Error(`RpcError: type=errorResponse-04`);
+						}
+
+						resolve(result[0]);
+
+						logStats(request.method, true, new Date().getTime() - startTime, true);
+
+						callback();
+
+					} catch (e) {
+						e.userData = {error:err, request:request, result:result};
+
+						utils.logError("283h7ewsede", e, {error:err, request:request, result:result});
+
+						reject(e);
+
+						callback();
 					}
-
-					if (result.name && result.name == "RpcError") {
-						logStats(request.method, true, new Date().getTime() - startTime, false);
-
-						throw new Error(`RpcError: type=errorResponse-04`);
-					}
-
-					resolve(result[0]);
-
-					logStats(request.method, true, new Date().getTime() - startTime, true);
-
-					callback();
-
-				} catch (e) {
-					e.userData = {error:err, request:request, result:result};
-
-					utils.logError("283h7ewsede", e, {error:err, request:request, result:result});
-
-					reject(e);
-
-					callback();
-				}
-			});
+				});
+			} catch (e) {
+				logStats(request.method, true, new Date().getTime() - startTime, false);
+				e.userData = {request:request};
+				utils.logError("rpc-client-error-02", e, {request:request});
+				reject(e);
+				callback();
+			}
 		};
 		
 		rpcQueue.push({rpcCall:rpcCall});

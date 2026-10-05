@@ -282,7 +282,13 @@ router.post("/connect", function(req, res, next) {
 	res.redirect("/");
 });
 
-router.get("/disconnect", function(req, res, next) {
+router.post("/disconnect", function(req, res, next) {
+	// Require active session to disconnect
+	if (!req.session.host || req.session.host.trim() === "") {
+		res.status(403).send("Forbidden: No active connection to disconnect");
+		return;
+	}
+
 	res.cookie('rpc-host', "");
 	res.cookie('rpc-port', "");
 	res.cookie('rpc-username', "");
