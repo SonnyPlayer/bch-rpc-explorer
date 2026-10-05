@@ -4,7 +4,7 @@ script.
 			if (document.hidden)
 				return;
 			$.ajax({
-				url: "!{reloadPollUrl}",
+				url: #{JSON.stringify(reloadPollUrl)},
 			}).done(function(reload) {
 				if (reload) {
 					window.location.reload(false);

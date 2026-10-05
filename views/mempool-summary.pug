@@ -88,7 +88,7 @@ block endOfBody
 	script.
 		var txidChunks = !{JSON.stringify(mempooltxidChunks)};
 		var satoshiPerByteBucketMaxima = !{JSON.stringify(satoshiPerByteBucketMaxima)};
-		var inputChunkSize = !{inputChunkSize};
+		var inputChunkSize = #{JSON.stringify(inputChunkSize)};
 
 		$(document).ready(function() {
 			loadMempool(txidChunks, inputChunkSize, txidChunks.length * inputChunkSize);
@@ -488,7 +488,7 @@ block endOfBody
 				"sizeBucketLabels":sizeBucketLabels
 			};
 
-			var satsMultiplier = !{coinConfig.baseCurrencyUnit.multiplier};
+			var satsMultiplier = #{JSON.stringify(coinConfig.baseCurrencyUnit.multiplier)};
 			for (var x = 0; x < rawdata.length; x++) {
 				var txMempoolInfo = rawdata[x].entry;
 				if (txMempoolInfo.modifiedfee) {

@@ -102,7 +102,7 @@ block endOfBody
 	script(src='/js/decimal.min.js', integrity="sha384-zcNJYsoavmOdYj5MgXBBIO8scbka8MlR5mSGt0GKjdqbm26j4w0yVyOb9s5rY7Jh")
 
 	script.
-		var currentBlockHeight = !{currentBlockHeight};
+		var currentBlockHeight = #{JSON.stringify(currentBlockHeight)};
 		$(document).ready(function() {
 			$("#time-range-buttons .block-count-btn").on("click", function() {
 				// highlight current selection
@@ -288,7 +288,7 @@ block endOfBody
 			});
 		}
 
-		var satsMultiplier = !{coinConfig.baseCurrencyUnit.multiplier};
+		var satsMultiplier = #{JSON.stringify(coinConfig.baseCurrencyUnit.multiplier)};
 		function summarizeData(results) {
 			var summary = {};
 
