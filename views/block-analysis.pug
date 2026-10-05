@@ -299,7 +299,13 @@ block endOfBody
 
 				row.removeClass("row-prototype");
 
-				row.find(".data-tx-link").html(`<a href='/tx/${item.txid}'>${item.txid.substring(0, 14)}<span class='d-inline d-xl-none'>${item.txid.substring(14, 32)}</span><span class='d-none d-xxl-inline'>${item.txid.substring(14, 30)}</span>…</a>`);
+				// Use text() and attr() instead of html() to prevent XSS from malicious RPC responses
+				var link = $('<a>').attr('href', '/tx/' + item.txid);
+				link.append($('<span>').text(item.txid.substring(0, 14)));
+				link.append($('<span>').addClass('d-inline d-xl-none').text(item.txid.substring(14, 32)));
+				link.append($('<span>').addClass('d-none d-xxl-inline').text(item.txid.substring(14, 30)));
+				link.append(document.createTextNode('…'));
+				row.find(".data-tx-link").empty().append(link);
 				row.find(".data-tx-value").text(item.value);
 				
 				updateCurrencyValue(row.find(".data-tx-value"), item.value);
@@ -320,7 +326,13 @@ block endOfBody
 
 				row.removeClass("row-prototype");
 
-				row.find(".data-tx-link").html(`<a href='/tx/${item.txid}'>${item.txid.substring(0, 14)}<span class='d-inline d-xl-none'>${item.txid.substring(14, 32)}</span><span class='d-none d-xxl-inline'>${item.txid.substring(14, 30)}</span>…</a>`);
+				// Use text() and attr() instead of html() to prevent XSS from malicious RPC responses
+				var link = $('<a>').attr('href', '/tx/' + item.txid);
+				link.append($('<span>').text(item.txid.substring(0, 14)));
+				link.append($('<span>').addClass('d-inline d-xl-none').text(item.txid.substring(14, 32)));
+				link.append($('<span>').addClass('d-none d-xxl-inline').text(item.txid.substring(14, 30)));
+				link.append(document.createTextNode('…'));
+				row.find(".data-tx-link").empty().append(link);
 				row.find(".data-tx-value").text(item.value);
 				
 				updateCurrencyValue(row.find(".data-tx-value"), item.value);
@@ -341,8 +353,17 @@ block endOfBody
 
 				row.removeClass("row-prototype");
 
-				row.find(".data-tx-link").html(`<a href='/tx/${item.txid}'>${item.txid.substring(0, 14)}<span class='d-inline d-xl-none'>${item.txid.substring(14, 32)}</span><span class='d-none d-xxl-inline'>${item.txid.substring(14, 30)}</span>…</a>`);
-				row.find(".data-tx-value").html(`<span>${parseInt(item.value).toLocaleString()} <small>B</small></span>`);
+				// Use text() and attr() instead of html() to prevent XSS from malicious RPC responses
+				var link = $('<a>').attr('href', '/tx/' + item.txid);
+				link.append($('<span>').text(item.txid.substring(0, 14)));
+				link.append($('<span>').addClass('d-inline d-xl-none').text(item.txid.substring(14, 32)));
+				link.append($('<span>').addClass('d-none d-xxl-inline').text(item.txid.substring(14, 30)));
+				link.append(document.createTextNode('…'));
+				row.find(".data-tx-link").empty().append(link);
+				
+				var valueSpan = $('<span>').text(parseInt(item.value).toLocaleString() + ' ');
+				valueSpan.append($('<small>').text('B'));
+				row.find(".data-tx-value").empty().append(valueSpan);
 
 				row.show();
 
@@ -384,7 +405,9 @@ block endOfBody
 					row.addClass("table-borderless");
 				}
 
-				row.find(".data-type").html(`<span title='Type: ${item.type}' data-toggle='tooltip'>${item.type}</span>`);
+				// Use text() and attr() instead of html() to prevent XSS from malicious RPC responses
+				var typeSpan = $('<span>').attr('title', 'Type: ' + item.type).attr('data-toggle', 'tooltip').text(item.type);
+				row.find(".data-type").empty().append(typeSpan);
 				row.find(".data-count").text(item.count.toLocaleString());
 
 				row.show();
@@ -403,7 +426,9 @@ block endOfBody
 					row.addClass("table-borderless");
 				}
 
-				row.find(".data-type").html(`<span title='Type: ${item.type}' data-toggle='tooltip'>${item.type}</span>`);
+				// Use text() and attr() instead of html() to prevent XSS from malicious RPC responses
+				var typeSpan = $('<span>').attr('title', 'Type: ' + item.type).attr('data-toggle', 'tooltip').text(item.type);
+				row.find(".data-type").empty().append(typeSpan);
 				row.find(".data-count").text(item.count.toLocaleString());
 
 				row.show();
